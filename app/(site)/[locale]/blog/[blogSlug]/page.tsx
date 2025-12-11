@@ -116,9 +116,6 @@ export default async function IndexPage({ params, searchParams }: Props) {
         <div className="mx-auto max-w-screen-md px-4 mt-8">
           {tags.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-                Tagged with
-              </h3>
               <BlogTags tags={tags} />
             </div>
           )}
