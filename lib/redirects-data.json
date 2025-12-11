@@ -1,0 +1,10 @@
+[
+  {
+    "fromPath": "/old-blog",
+    "toPath": "/blog",
+    "statusCode": 301,
+    "preserveQuery": true,
+    "active": true,
+    "source": "Manual"
+  }
+]

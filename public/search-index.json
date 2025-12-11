@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "generatedAt": "2025-12-11T18:17:51.720Z",
+  "documents": [
+    {
+      "id": "3tKE478aivJfV8zuaGQqjF",
+      "type": "page",
+      "title": "Home",
+      "path": "/home",
+      "excerpt": "home page where it all starts",
+      "updatedAt": "2025-12-11T17:38:12.556Z"
+    },
+    {
+      "id": "faqHome",
+      "type": "page",
+      "title": "Help & FAQs",
+      "path": "/faqs",
+      "excerpt": "All frequently asked questions for the people portal.",
+      "updatedAt": "2025-12-11T11:59:59.678Z"
+    },
+    {
+      "id": "faqIt",
+      "type": "page",
+      "title": "IT & Access FAQs",
+      "path": "/faqs/it-faqs",
+      "excerpt": "Questions about login, password resets, and tools.",
+      "updatedAt": "2025-12-11T11:59:59.624Z"
+    },
+    {
+      "id": "2HP8lYdUk9zncpfKRWKyf8",
+      "type": "page",
+      "title": "Blog",
+      "path": "/blog",
+      "excerpt": "All blogs",
+      "updatedAt": "2025-12-11T11:59:59.356Z"
+    },
+    {
+      "id": "1m368kHR7entsuNv4boBkV",
+      "type": "blog",
+      "title": "Maximizing the Impact of Quarterly Reviews",
+      "path": "/blog/maximizing-the-impact-of-quarterly-reviews",
+      "excerpt": "In today's fast-paced work environment, effective performance management is crucial for both organizational success and employee growth.",
+      "publishedDate": null,
+      "updatedAt": "2025-12-11T10:13:09.464Z"
+    },
+    {
+      "id": "1d9o5wXomBkxVhnG71DNEq",
+      "type": "blog",
+      "title": "How to use your annual learning allowance.",
+      "path": "/blog/how-to-use-your-annual-learning-allowance",
+      "excerpt": "What’s covered, how to request approval, how to pay, and how to get reimbursed for courses, conferences, and learning tools.",
+      "publishedDate": null,
+      "updatedAt": "2025-12-11T10:13:00.041Z"
+    }
+  ]
+}

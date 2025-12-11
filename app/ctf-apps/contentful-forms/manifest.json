@@ -1,0 +1,22 @@
+{
+  "name": "Contentful Forms",
+  "src": "app/ctf-apps/contentful-forms/page.tsx",
+  "locations": [
+    {
+      "location": "page",
+      "src": "app/ctf-apps/contentful-forms/locations/app-page.tsx"
+    },
+    {
+      "location": "field",
+      "src": "app/ctf-apps/contentful-forms/locations/field/form-schema-field.tsx"
+    },
+    {
+      "location": "dialog",
+      "src": "app/ctf-apps/contentful-forms/locations/dialog/form-builder-dialog.tsx"
+    },
+    {
+      "location": "app-config",
+      "src": "app/ctf-apps/contentful-forms/locations/config-screen.tsx"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Legend 2.0 Cycling Shoes",
+    "price": "$215.00",
+    "description": "With built-in features for a perfect fit and ride-enhancing technology, these cycling shoes are designed to keep up—no matter how hard you ride. LOOK® Delta cleats included.",
+    "imageSrc": "https://images.ctfassets.net/s6w71u4wlhmg/10joBZxc6qoPzhLC2dJKsQ/36e5a270c70e5e0641f166376c096309/equinox-Shoe1_1920x.webp"
+  },
+  {
+    "name": "SoulCycle Heather Gray Socks",
+    "price": "$14.00",
+    "description": "These SoulCycle socks are specially designed to maximize comfort and support—ride after ride.",
+    "imageSrc": "https://images.ctfassets.net/s6w71u4wlhmg/0U0ciEhl9swUElWq5Csja/ae2fa1a0f235781e105b9d5bf048ea25/equinox-Socks_yellow_1920x.webp"
+  },
+  {
+    "name": "SoulCycle x Jaybird Vista True Wireless Sport Headphones",
+    "price": "$149.00",
+    "description": "Cutting-edge wireless technology designed to power your performance on and off the bike. Lightweight design, 16 hours of battery life, and an IPX7 waterproof rating allow you to make the most of every sweat session—without missing a beat.",
+    "imageSrc": "https://images.ctfassets.net/s6w71u4wlhmg/6deV9OOqWp83WRiae7XbEl/59e5d8aa15c57c04fa5bcaaa45a0e3a0/equinox-3_Jaybird_Headphones_076_t_1920x.webp"
+  }
+]

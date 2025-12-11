@@ -1,0 +1,208 @@
+Goal
+
+Build a Contentful App that lets editors define brand themes as tokens, see the site update live in a preview, and save/publish a single source of truth Theme JSON.
+
+Scope and outcomes
+
+- Editors configure theme tokens (colors, radius, borders, typography, logos) and preview changes instantly.
+- The app persists a validated Theme JSON as the single source of truth on a `Theme` entry.
+- One-click exports to CSS variables and Tailwind v4 `@theme` (default) for downstream integration.
+
+Core user stories
+
+- As an editor I can open a `Theme` entry and see controls with a live preview.
+- As an editor I can tweak tokens and see the preview update immediately.
+- As an editor I can load a preset template and reset changes.
+- As an editor I can save and publish the `Theme` entry.
+- As a developer I can copy CSS variables or a Tailwind `@theme` block.
+
+Content model
+
+- Content type: `Theme`
+- Fields:
+  - `name` (Short text)
+  - `themeJson` (JSON; single source of truth)
+  - `logoLight` (Asset, optional)
+  - `logoDark` (Asset, optional)
+
+Theme JSON shape
+
+{
+  "meta": { "version": 1, "name": "Acme", "syncLightDark": true },
+  "colors": {
+    "light": {
+      "background": "oklch(1 0 0)",
+      "foreground": "oklch(0.14 0.02 258)",
+      "primary": "oklch(0.72 0.20 260)",
+      "primary-foreground": "oklch(0.98 0.02 260)",
+      "secondary": "oklch(0.96 0.01 260)",
+      "ring": "oklch(0.40 0.05 260)",
+      "border": "oklch(0.92 0.01 260)"
+    },
+    "dark": {
+      "background": "oklch(0.13 0.02 258)"
+    }
+  },
+  "shape": { "radius": "0.5rem", "border": "1px" },
+  "typography": {
+    "sizeScale": { "sm": "0.875rem", "md": "1rem", "lg": "1.125rem" },
+    "fonts": [
+      { "family": "Inter", "variants": ["400", "700"], "axes": ["wght"] }
+    ],
+    "fallbacks": ["ui-sans-serif", "system-ui"]
+  },
+  "assets": { "logoLightUrl": "", "logoDarkUrl": "" }
+}
+
+Architecture
+
+- Shell: Contentful App SDK in a React single-page app.
+- Left pane: token editor controls.
+- Preview model: No in-app iframe. Preview occurs on the downstream site using Contentful Preview (GraphQL/REST Preview APIs). Editors use the website's preview URL to see changes.
+- State: local draft of `themeJson`, mirrored to the field with debounced saves.
+- - Fonts: Best practice is to self-host via `@fontsource` on the consuming site for privacy, performance, and determinism. Optionally, allow Google Fonts CSS2 as a fallback in non-production. Store families/variants in `typography.fonts`.
+
+UI layout
+
+- Header: Theme name, Save, Publish, Template picker, Reset, light/dark sync toggle.
+- Tabs:
+  - Colors: background, foreground, primary (+ foreground), secondary, ring, border.
+  - Shape: radius, border width.
+  - Typography: size scale, font families/variants, fallbacks.
+  - Assets: logo pickers.
+  - Exports: Copy CSS vars, Copy `@theme`, Download JSON.
+
+Preview behavior (downstream site)
+
+- The downstream site must consume `themeJson` from Contentful using the Preview API when in preview mode.
+- After field saves (auto-save/debounced) in Contentful, editors switch to or refresh the preview site to see changes reflected immediately (SSR/ISR-disabled preview).
+- Provide integration docs/snippets for the downstream site to map `themeJson` to CSS variables (and optionally Tailwind `@theme`) at runtime. Keep framework-agnostic examples (vanilla CSS/JS, React, etc.).
+
+Data flow
+
+- Load entry via App SDK, parse `themeJson`. If empty, seed defaults.
+- Bind controls to local state.
+- On change: update local draft and debounce 500–800ms, then write to Contentful field (draft).
+- Save: `entry.update()`; Publish: `entry.publish()`.
+
+Validation
+
+- Colors: OKLCH preferred; also allow HEX/HSL. Clamp ranges; reject `url(` and non-colors.
+- Sizes: `^\d+(\.\d+)?(rem|px)$` for radius, border, sizes.
+- Fonts: if using CSS2, validate families and build allow-listed URLs; if using `@fontsource`, validate package names.
+- Assets: enforce Contentful asset host allow-list.
+- Optional: compute contrast ratios and warn when WCAG AA fails.
+ - Dark mode auto-derive: if `meta.syncLightDark` is true, auto-generate dark tokens from light using OKLCH adjustments. Allow manual overrides when sync is off.
+   - Background: target a dark background around L≈0.13 (clamp to [0.10, 0.18]), keep hue; reduce chroma by ~10%.
+   - Foreground: compute text color to meet WCAG AA (≥4.5:1) against background. Prefer near-white `oklch(0.98, 0.02, H)` if background L<0.4; otherwise near-black `oklch(0.14, 0.02, H)`.
+   - Primary/secondary: reduce L by ~0.25 then clamp to [0.20, 0.80]; reduce chroma by ~10%; preserve hue. Derive `*-foreground` via contrast rule above.
+   - Ring/border: set L to background L + 0.10 and +0.20 respectively (clamp to [0.18, 0.70]); reduce chroma by ~10%.
+
+Exports
+
+- CSS variables
+
+:root{
+  --color-background: oklch(...);
+  --color-foreground: oklch(...);
+  --color-primary: oklch(...);
+  --color-primary-foreground: oklch(...);
+  --color-secondary: oklch(...);
+  --color-ring: oklch(...);
+  --color-border: oklch(...);
+  --radius: 0.5rem;
+  --border-size: 1px;
+}
+.dark{ /* overrides for dark */ }
+
+- Tailwind v4 `@theme` (exported by default)
+
+@theme {
+  --color-background: oklch(...);
+  --color-foreground: oklch(...);
+  --color-primary: oklch(...);
+  --color-primary-foreground: oklch(...);
+  --color-secondary: oklch(...);
+  --color-ring: oklch(...);
+  --color-border: oklch(...);
+  --radius: 0.5rem;
+  --border-size: 1px;
+}
+
+Consumer integration (agnostic)
+
+- Apply tokens as CSS variables on document root and `.dark` when applicable.
+- Generate Tailwind v4 `@theme` by default at build time (or inject at runtime) for design tokens. Provide a CSS variables fallback for non-Tailwind consumers.
+- Provide tiny reference adapters (optional) for React/Vanilla to read `themeJson` and set variables without any UI library dependency.
+
+Templates
+
+- Preset JSON files in `config/`; apply replaces current draft with confirm-before-overwrite.
+
+Security
+
+- No iframe/JWT required in this app since preview occurs on the downstream site.
+- Follow Contentful App SDK security best practices and validate all user inputs.
+
+Performance
+
+- Debounce field writes to avoid rate limits.
+- Avoid heavy computations on every keystroke; batch validations and serialization.
+
+Telemetry
+
+- Track: apply-template, copy-export, save, publish, validation-error. Include `entryId`, `spaceId`, `meta.version`.
+
+Tasks and status
+
+- Define Theme JSON types and validators — pending
+- Implement App shell (locations, layout, state) — in_progress
+- Build color/shape/typography/assets editors — pending
+- Fonts: BEST PRACTICE selected: self-host via `@fontsource` on consuming site; allow CSS2 fallback — completed
+- Preview: document downstream preview integration (no iframe/JWT) — pending
+- Export serializers (CSS vars, `@theme` default) — pending
+- Consumer-agnostic integration snippets/adapters — pending
+- Templates: preset JSON and apply flow — pending
+- Performance: debounce writes, batch validations — pending
+- Telemetry events — pending
+- E2E: sandbox space test flow — pending
+- Dark-mode derivation parameters decided — completed
+
+Testing
+
+ Unit tests for validators and template application.
+
+ E2E test in Contentful sandbox space: open entry, tweak color, verify preview CSS var changes, save, publish.
+
+Definition of done
+
+- Theme JSON validated and versioned; migrations in place if schema evolves.
+- Live preview updates instantly and reflects all tokens.
+- Exports produce correct CSS variables and Tailwind `@theme` blocks.
+- Fonts selection works with chosen strategy; preview parity confirmed.
+- Templates apply safely with confirmation and telemetry.
+- Save/publish flows work in Contentful; no rate-limit issues.
+- Basic accessibility checks (contrast warnings) present.
+
+Business Goals and PRD
+
+User story
+As a solution engineer, when I want to configure a demo instance for a demo, I want to be able to quickly arrive at a visual style to approximate the brand style of a prospect. 
+
+Business problem
+SEs now have more theming control of their demo stack — but cannot rapidly explore customer brands in a visual manner to ensure quality and accuracy. Most theming solutions and UIs give more granular control over visual attributes — but too much control can slow you down. SEs need “just enough” visual style control without having to get under the hood or edit JSON files to control appearance. 
+
+Solution
+We already have powerful tools like DemAI to help extract design tokens from customer brands, and a global settings file in the Demo 2.0 content model. What if we had a visual editor to rapidly iterate entire themes — visually?
+The Theme Builder App lets SEs rapidly style demos with 
+Smart color palettes, generated from a single “seed” color
+Multiple color theming models: light, dark, and tint (full color wash). These were handcrafted from deep color theory expertise and a survey of our biggest customer brands, ensuring high-quality design defaults that match how great global brands design their experiences.
+Typography presets with curated font pairings. 
+Global settings for style elements like spacing and corner treatments
+
+The Future
+In the future, Theme Builder will take rapid brand styling to other worlds:
+- Design token import and export enables connections to other products like Studio, future channels like Mobile and social, and design tools like Figma (which just announced support for this).
+- Easy sharing of themes in Contentful entries
+- Designed to align with current and future tools: Live Preview-ready, DemAI for input upstream, and a robust theming model to enhance Demo2 
+- Advanced customization enabled through Theme Builder’s powerful App configuration, with access to the full JSON configuration

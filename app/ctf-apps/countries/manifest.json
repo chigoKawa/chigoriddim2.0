@@ -1,0 +1,18 @@
+{
+  "name": "Countries App",
+  "src": "app/ctf-apps/countries/page.tsx",
+  "locations": [
+    {
+      "location": "page",
+    "src": "app/ctf-apps/countries/locations/app-page.tsx"
+    },
+    {
+      "location": "field",
+      "src": "app/ctf-apps/countries/locations/field/country-field.tsx"
+    },
+    {
+      "location": "entry-sidebar",
+      "src": "app/ctf-apps/countries/locations/entry-sidebar/stats-sidebar.tsx"
+    }
+  ]
+}

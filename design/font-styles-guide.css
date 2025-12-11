@@ -1,0 +1,121 @@
+:root {
+    /* These are the base font styles that are combined in theme packages. All Google Fonts for easy linking */
+    --font-stack-default: 'Geist Sans', 'Helvetica Neue', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-stack-sf-pro: 'SF Pro', 'Helvetica Neue', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-stack-crimson: 'Crimson Pro', 'Georgia', serif;
+    --font-stack-besley: 'Besley', 'Georgia', serif;
+    --font-stack-sofia: 'Sofia Sans', 'Arial', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-stack-sofia-cond: 'Sofia Sans Condensed', 'Arial Narrow', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-stack-dm-sans: 'DM Sans', 'Helvetica Neue', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+/* basic elements, c.f. Figma mockups */
+.header {
+    font-family: var(--font-default);
+    font-size: 2rem;
+    font-style: bold;
+    font-weight: 200;
+    line-height: 110%;
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+}
+.subheader {
+    font-family: var(--font-default);
+    font-size: 1.3rem;
+    font-style: italic;
+    font-weight: 700;
+    line-height: 110%;
+    margin-bottom: 1rem;
+    letter-spacing: -0.05em;
+}
+.body-text{
+    font-family: var(--font-default);
+    font-size: 1rem;
+    font-style: normal;
+    font-size: 400;
+    line-height: 125%;
+    letter-spacing: 0;
+}
+.ui-text{
+    font-family: var(--font-default);
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 110%;
+    letter-spacing: 0.02em;
+}
+/* Theme definitions. Define the font stack vars  */
+.theme-simple {
+    --font-header: var(--font-stack-sf-pro);
+    --font-subheader: var(--font-stack-sf-pro);
+    --font-body: var(--font-stack-sf-pro);
+    --font-ui: var(--font-stack-sf-pro);
+    .header {
+        font-family: var(--font-header);
+    }
+    .subheader {
+        font-family: var(--font-subheader);
+    }
+    .body-text{
+        font-family: var(--font-body);
+    }
+    .ui-text{
+        font-family: var(--font-ui);
+    }
+}
+
+.theme-classy {
+    --font-header: var(--font-stack-crimson);
+    --font-subheader: var(--font-stack-dm-sans);
+    --font-body: var(--font-stack-crimson);
+    --font-ui: var(--font-stack-dm-sans);
+    .header {
+        font-family: var(--font-header);
+    }
+    .subheader {
+        font-family: var(--font-subheader);
+    }
+    .body-text{
+        font-family: var(--font-body);
+    }
+    .ui-text{
+        font-family: var(--font-ui);
+    }
+}
+
+.theme-literary {
+    --font-header: var(--font-stack-besley);
+    --font-subheader: var(--font-stack-dm-sans);
+    --font-body: var(--font-stack-besley);
+    --font-ui: var(--font-stack-dm-sans);
+    .header {
+        font-family: var(--font-header);
+    }
+    .subheader {
+        font-family: var(--font-subheader);
+    }
+    .body-text{
+        font-family: var(--font-body);
+    }
+    .ui-text{
+        font-family: var(--font-ui);
+    }
+}
+
+.theme-industrial {
+    --font-header: var(--font-stack-sofia-cond);
+    --font-subheader: var(--font-stack-sofia);
+    --font-body: var(--font-stack-sofia);
+    --font-ui: var(--font-stack-dm-sofia-cond);
+    .header {
+        font-family: var(--font-header);
+    }
+    .subheader {
+        font-family: var(--font-subheader);
+    }
+    .body-text{
+        font-family: var(--font-body);
+    }
+    .ui-text{
+        font-family: var(--font-ui);
+    }
+}

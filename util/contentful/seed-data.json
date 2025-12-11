@@ -1,0 +1,141 @@
+{
+  "spaceId": "skzlea4w0ev5",
+  "environmentId": "master",
+  "locale": "en-US",
+  "faqItems": [
+    {
+      "id": "faqHrTimeOff",
+      "contentTypeId": "faqItem",
+      "fields": {
+        "internalTitle": "HR – Requesting time off",
+        "question": "How do I request time off?",
+        "answer": [
+          "You can request time off via the People Portal under \"Time & Attendance\".",
+          "Your manager will receive a notification to approve or decline your request."
+        ]
+      }
+    },
+    {
+      "id": "faqHrBenefits",
+      "contentTypeId": "faqItem",
+      "fields": {
+        "internalTitle": "HR – Benefits overview",
+        "question": "Where can I see my benefits and coverage?",
+        "answer": [
+          "Your benefits overview is available in the People Portal under \"Benefits\".",
+          "You can download policy documents and see who to contact for questions."
+        ]
+      }
+    },
+    {
+      "id": "faqItPassword",
+      "contentTypeId": "faqItem",
+      "fields": {
+        "internalTitle": "IT – Resetting my password",
+        "question": "How do I reset my corporate password?",
+        "answer": [
+          "If you still have access to your account, use the \"Change password\" option in the People Portal profile menu.",
+          "If you are locked out, click \"Forgot password\" on the login page and follow the instructions.",
+          "If you’re still stuck, contact the IT Service Desk via the Support page."
+        ]
+      }
+    }
+  ],
+  "faqGroups": [
+    {
+      "id": "faqGroupHr",
+      "contentTypeId": "faqGroup",
+      "fields": {
+        "internalTitle": "HR FAQs – People Portal",
+        "title": "HR & People FAQs",
+        "description": "Common questions about time off, benefits, and people processes.",
+        "items": ["faqHrTimeOff", "faqHrBenefits"]
+      }
+    },
+    {
+      "id": "faqGroupIt",
+      "contentTypeId": "faqGroup",
+      "fields": {
+        "internalTitle": "IT FAQs – People Portal",
+        "title": "IT & Access FAQs",
+        "description": "Help with login, password resets, and getting access to tools.",
+        "items": ["faqItPassword"]
+      }
+    }
+  ],
+  "frames": [
+    {
+      "id": "frameFaqHome",
+      "contentTypeId": "frame",
+      "fields": {
+        "internalTitle": "FAQ Home – All Topics",
+        "layout": "list",
+        "theme": "light",
+        "backgroundColor": "transparent",
+        "alignment": "left",
+        "things": ["faqGroupHr", "faqGroupIt"]
+      }
+    },
+    {
+      "id": "frameFaqHr",
+      "contentTypeId": "frame",
+      "fields": {
+        "internalTitle": "FAQ – HR",
+        "layout": "list",
+        "theme": "light",
+        "backgroundColor": "transparent",
+        "alignment": "left",
+        "things": ["faqGroupHr"]
+      }
+    },
+    {
+      "id": "frameFaqIt",
+      "contentTypeId": "frame",
+      "fields": {
+        "internalTitle": "FAQ – IT",
+        "layout": "list",
+        "theme": "light",
+        "backgroundColor": "transparent",
+        "alignment": "left",
+        "things": ["faqGroupIt"]
+      }
+    }
+  ],
+  "landingPages": [
+    {
+      "id": "faqHome",
+      "contentTypeId": "landingPage",
+      "fields": {
+        "internalTitle": "FAQ – Help Center",
+        "title": "Help & FAQs",
+        "slugSegment": "faqs",
+        "searchSummary": "All frequently asked questions for the people portal.",
+        "frames": ["frameFaqHome"]
+      }
+    },
+    {
+      "id": "faqHr",
+      "contentTypeId": "landingPage",
+      "fields": {
+        "internalTitle": "FAQ – HR",
+        "title": "HR FAQs",
+        "slugSegment": "hr-faqs",
+        "searchSummary": "Questions about time off, benefits, and people processes.",
+        "parent": "faqHome",
+        "frames": ["frameFaqHr"]
+      }
+    },
+    {
+      "id": "faqIt",
+      "contentTypeId": "landingPage",
+      "fields": {
+        "internalTitle": "FAQ – IT",
+        "title": "IT & Access FAQs",
+        "slugSegment": "it-faqs",
+        "searchSummary": "Questions about login, password resets, and tools.",
+        "parent": "faqHome",
+        "frames": ["frameFaqIt"]
+      }
+    }
+  ]
+}

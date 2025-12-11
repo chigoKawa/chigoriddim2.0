@@ -1,0 +1,26 @@
+{
+  "name": "Pexels Pon Contentful",
+  "src": "app/ctf-apps/pexels-pon-contentful/page.tsx",
+  "locations": [
+    {
+      "location": "page",
+      "src": "app/ctf-apps/pexels-pon-contentful/locations/app-page.tsx"
+    },
+    {
+      "location": "field",
+      "src": "app/ctf-apps/pexels-pon-contentful/locations/field/pexels-field.tsx"
+    },
+    {
+      "location": "entry-sidebar",
+      "src": "app/ctf-apps/pexels-pon-contentful/locations/entry-sidebar/sidebar-summary.tsx"
+    },
+    {
+      "location": "dialog",
+      "src": "app/ctf-apps/pexels-pon-contentful/locations/dialog/pexels-search-dialog.tsx"
+    },
+    {
+      "location": "app-config",
+      "src": "app/ctf-apps/pexels-pon-contentful/locations/config-screen.tsx"
+    }
+  ]
+}
