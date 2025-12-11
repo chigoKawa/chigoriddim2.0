@@ -112,6 +112,47 @@ export const getLocales = async () => {
   }
 };
 
+/**
+ * Fetches blog posts that share at least one tag with the given tag IDs.
+ * Excludes the current post by slug.
+ */
+export const getRelatedBlogPosts = async (
+  tagIds: string[],
+  excludeSlug: string,
+  locale: string,
+  limit: number = 3
+): Promise<Entry<EntrySkeletonType>[]> => {
+  if (!tagIds.length) return [];
+
+  try {
+    const entries = await client.getEntries({
+      content_type: "blogPost",
+      "metadata.tags.sys.id[in]": tagIds,
+      "fields.slug[ne]": excludeSlug,
+      locale,
+      limit,
+      include: 2,
+    });
+    return entries.items;
+  } catch (error) {
+    console.error("Error fetching related blog posts:", error);
+    return [];
+  }
+};
+
+/**
+ * Fetches all Contentful tags.
+ */
+export const getTags = async () => {
+  try {
+    const response = await client.getTags();
+    return response.items;
+  } catch (error) {
+    console.error("Error fetching tags:", error);
+    return [];
+  }
+};
+
 export const getAllPageSlugs = async <T extends EntrySkeletonType>(
   options: Record<string, unknown>,
   isPreviewEnabled: boolean = false

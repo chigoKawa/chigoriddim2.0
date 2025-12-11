@@ -1,5 +1,5 @@
 import { Locale } from "@/i18n-config"; // Import locale type for internationalization
-import { getEntries } from "@/lib/contentful"; // Function to fetch data from Contentful
+import { getEntries, getRelatedBlogPosts, getTags } from "@/lib/contentful"; // Function to fetch data from Contentful
 import type { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
 import {
@@ -11,6 +11,8 @@ import { extractContentfulAssetUrl } from "@/lib/utils";
 import LivePreviewProviderWrapper from "@/features/contentful/live-preview-provider-wrapper";
 import { JsonLd } from "@/components/seo/json-ld";
 import { generateBlogPostSchema } from "@/lib/seo";
+import { BlogTags } from "@/features/contentful/components/blog-tags";
+import { RelatedPosts } from "@/features/contentful/components/related-posts";
 
 const INCLUDES_COUNT = 6;
 
@@ -43,6 +45,30 @@ export default async function IndexPage({ params, searchParams }: Props) {
   if (!blogEntry) {
     notFound();
   }
+
+  // Extract tags from the blog entry metadata
+  const entryTags = blogEntry.metadata?.tags || [];
+  const tagIds = entryTags.map((tag) => tag.sys.id);
+
+  // Fetch all tags to get tag names, and related posts in parallel
+  const [allTags, relatedPostsRaw] = await Promise.all([
+    getTags(),
+    tagIds.length > 0
+      ? getRelatedBlogPosts(tagIds, blogSlug, locale, 3)
+      : Promise.resolve([]),
+  ]);
+
+  // Map tag IDs to names
+  const tags = entryTags.map((tagLink) => {
+    const fullTag = allTags.find((t) => t.sys.id === tagLink.sys.id);
+    return {
+      id: tagLink.sys.id,
+      name: fullTag?.name || tagLink.sys.id,
+    };
+  });
+
+  // Cast related posts
+  const relatedPosts = relatedPostsRaw as IBlogPostPage[];
 
   // Generate JSON-LD structured data for blog post
   const blogPath = `/blog/${blogSlug}`;
@@ -85,6 +111,21 @@ export default async function IndexPage({ params, searchParams }: Props) {
         isPreviewEnabled={!!isPreviewEnabled}
       >
         <ContentfulBlogPage entry={blogEntry} />
+
+        {/* Tags section */}
+        <div className="mx-auto max-w-screen-md px-4 mt-8">
+          {tags.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+                Tagged with
+              </h3>
+              <BlogTags tags={tags} />
+            </div>
+          )}
+
+          {/* Related posts section */}
+          <RelatedPosts posts={relatedPosts} locale={locale} />
+        </div>
       </LivePreviewProviderWrapper>
     </div>
   );
