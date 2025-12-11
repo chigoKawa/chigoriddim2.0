@@ -24,6 +24,10 @@ const Sparkles = dynamic(
   () => import("@/components/ui/particles").then((mod) => mod.Sparkles),
   { ssr: false }
 );
+const AudioPlayer = dynamic(
+  () => import("@/components/ui/audio-player").then((mod) => mod.AudioPlayer),
+  { ssr: false }
+);
 // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function getSocialIcon(label: string) {
@@ -65,14 +69,11 @@ const Footer = ({
 
       <div className="relative z-10 mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="sm:flex sm:items-start sm:justify-between gap-8">
-          <div className="flex justify-center sm:justify-start mb-6 sm:mb-0">
-            <p className="text-2xl font-bold sm:text-3xl">
+          <div className="flex flex-col items-center sm:items-start gap-3 mb-6 sm:mb-0">
+            <AudioPlayer />
+            <p className="text-sm opacity-70">
               {siteName || "☕ A Chi Coffee Production"}
             </p>
-            {/* <Avatar className="w-40 h-40">
-              <AvatarImage src={getRandomLogo()} alt="@shadcn" />
-              <AvatarFallback>Your Logo</AvatarFallback>
-            </Avatar> */}
           </div>
 
           <div className="flex flex-col gap-4 items-end text-right">
