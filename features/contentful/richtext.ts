@@ -1,4 +1,3 @@
-// Re-export from the implementation module (TSX)
-export { baseRichTextOptions } from "./richtext-impl";
+// Re-export from the full implementation module with embedded entry support
+export { baseRichTextOptions } from "./richtext-full";
 export type { Options } from "@contentful/rich-text-react-renderer";
-// shim only; implementation lives in richtext.tsx

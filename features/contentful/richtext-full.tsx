@@ -77,35 +77,61 @@ export const baseRichTextOptions: Options = {
     [BLOCKS.EMBEDDED_ENTRY]: (node) => {
       const target = node?.data?.target;
       const contentTypeId = target?.sys?.contentType?.sys?.id;
-
       switch (contentTypeId) {
-        case "imageWrapper":
-        case "pexelsImageWrapper": {
-          // Render image wrapper
-          const imageEntry = target as IImageWrapper | IPexelsImageWrapper;
-          const asset = (imageEntry?.fields as IImageWrapper["fields"])?.asset;
-          const pexelsData = (
-            imageEntry?.fields as IPexelsImageWrapper["fields"]
-          )?.pexelsImage;
-          const imageUrl =
-            extractContentfulAssetUrl(asset || null) ||
-            pexelsData?.src?.large ||
-            pexelsData?.src?.medium ||
-            pexelsData?.src?.original;
+        case "imageWrapper": {
+          // Render Contentful image wrapper - uses 'image' field (not 'asset')
+          const imageEntry = target as IImageWrapper;
+          // The imageWrapper content type has 'image' field, not 'asset'
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const imageAsset = (imageEntry?.fields as any)?.image;
+          const imageUrl = imageAsset?.fields?.file?.url;
           if (!imageUrl) return null;
           const altText =
-            pexelsData?.alt ||
-            (imageEntry?.fields as IImageWrapper["fields"])?.internalTitle ||
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (imageEntry?.fields as any)?.altText ||
+            imageEntry?.fields?.internalTitle ||
+            imageAsset?.fields?.title ||
             "Embedded image";
           return (
-            <div className="my-6">
+            <figure className="my-6">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imageUrl.startsWith("//") ? `https:${imageUrl}` : imageUrl}
                 alt={altText}
-                className="rounded-md w-full object-cover"
+                className="rounded-lg shadow-sm max-w-full sm:max-w-md max-h-[400px] w-auto h-auto object-contain"
               />
-            </div>
+              {altText && altText !== "Embedded image" && (
+                <figcaption className="text-sm text-muted-foreground mt-2 italic">
+                  {altText}
+                </figcaption>
+              )}
+            </figure>
+          );
+        }
+        case "pexelsImageWrapper": {
+          // Render Pexels image wrapper - uses 'pexelsImage' field
+          const pexelsEntry = target as IPexelsImageWrapper;
+          const pexelsData = pexelsEntry?.fields?.pexelsImage;
+          const imageUrl =
+            pexelsData?.src?.large ||
+            pexelsData?.src?.medium ||
+            pexelsData?.src?.original;
+          if (!imageUrl) return null;
+          const altText = pexelsData?.alt || "Pexels image";
+          return (
+            <figure className="my-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl.startsWith("//") ? `https:${imageUrl}` : imageUrl}
+                alt={altText}
+                className="rounded-lg shadow-sm max-w-full sm:max-w-md max-h-[400px] w-auto h-auto object-contain"
+              />
+              {altText && altText !== "Pexels image" && (
+                <figcaption className="text-sm text-muted-foreground mt-2 italic">
+                  {altText}
+                </figcaption>
+              )}
+            </figure>
           );
         }
         case "videoWrapper": {
