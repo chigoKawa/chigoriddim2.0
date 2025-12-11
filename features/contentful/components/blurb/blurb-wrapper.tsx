@@ -2,31 +2,13 @@
 
 import React from "react";
 import { motion, type Variants } from "framer-motion";
-import Image from "next/image";
-import { Asset } from "contentful";
 import {
   useContentfulLiveUpdates,
   useContentfulInspectorMode,
 } from "@contentful/live-preview/react";
-import {
-  IBlurb,
-  IImageWrapper,
-  IPexelsImageWrapper,
-  IPexelsPhotoData,
-  IPexelsPhotoDataLegacy,
-} from "../../type";
-import { extractContentfulAssetUrl } from "@/lib/utils";
+import { IBlurb } from "../../type";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { baseRichTextOptions } from "@/features/contentful/richtext";
-
-/** Get URL from pexels data (handles both new and legacy formats) */
-function getPexelsImageUrl(
-  data: IPexelsPhotoData | IPexelsPhotoDataLegacy | undefined
-): string | undefined {
-  if (!data?.src) return undefined;
-  const s = data.src;
-  return s.large || s.medium || s.original;
-}
 
 const BlurbWrapper = ({ entry }: { entry: IBlurb }) => {
   // Live preview hooks
@@ -35,50 +17,8 @@ const BlurbWrapper = ({ entry }: { entry: IBlurb }) => {
     entryId: entry?.sys?.id,
   });
 
-  const internalTitle = liveEntry?.fields?.internalTitle as string;
   const body = liveEntry?.fields?.body;
-  const images = liveEntry?.fields?.images;
   const backgroundColor = liveEntry?.fields?.backgroundColor || "Default";
-
-  const extractedImageUrls = images
-    ?.map((image) => {
-      const imageEntry = image as unknown as
-        | IImageWrapper
-        | IPexelsImageWrapper;
-      const contentTypeId = imageEntry?.sys?.contentType?.sys?.id;
-      const fields = imageEntry?.fields as Partial<
-        IImageWrapper["fields"] & IPexelsImageWrapper["fields"]
-      > &
-        Partial<{ image?: Asset }>;
-
-      // Handle imageWrapper content type
-      if (contentTypeId === "imageWrapper") {
-        const asset = (fields?.asset || fields?.image) as Asset | undefined;
-        const url = extractContentfulAssetUrl(asset || null);
-        return url?.replace(/^\/\//, "https://");
-      }
-
-      // Handle pexelsImageWrapper content type
-      if (contentTypeId === "pexelsImageWrapper") {
-        const pexelsData = fields?.pexelsImage as
-          | IPexelsPhotoData
-          | IPexelsPhotoDataLegacy
-          | undefined;
-        const pexelsUrl = getPexelsImageUrl(pexelsData);
-        return pexelsUrl?.replace(/^\/\//, "https://");
-      }
-
-      // Fallback: try both approaches
-      const asset = (fields?.asset || fields?.image) as Asset | undefined;
-      const pexelsData = fields?.pexelsImage as
-        | IPexelsPhotoData
-        | IPexelsPhotoDataLegacy
-        | undefined;
-      const pexelsUrl = getPexelsImageUrl(pexelsData);
-      const url = extractContentfulAssetUrl(asset || null) || pexelsUrl;
-      return url?.replace(/^\/\//, "https://");
-    })
-    .filter((url): url is string => !!url);
 
   // Animation variants
   const containerVariants = {
@@ -86,44 +26,6 @@ const BlurbWrapper = ({ entry }: { entry: IBlurb }) => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-        staggerChildren: 0.2,
-      },
-    },
-  } as Variants;
-
-  const contentVariants = {
-    hidden: { opacity: 0, x: -30 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  } as Variants;
-
-  const imageVariants = {
-    hidden: { opacity: 0, x: 30 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  } as Variants;
-
-  const centeredVariants = {
-    hidden: { opacity: 0, y: 30, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
       transition: {
         duration: 0.6,
         ease: "easeOut",
@@ -158,23 +60,6 @@ const BlurbWrapper = ({ entry }: { entry: IBlurb }) => {
     }
   };
 
-  const hasImages = extractedImageUrls && extractedImageUrls.length > 0;
-
-  // Debug log for development
-  if (process.env.NODE_ENV === "development" && images?.length && !hasImages) {
-    console.log(
-      "[BlurbWrapper] Images field has entries but no URLs extracted:",
-      {
-        imagesCount: images.length,
-        imageEntries: images.map((img) => ({
-          id: (img as unknown as IImageWrapper)?.sys?.id,
-          contentType: (img as unknown as IImageWrapper)?.sys?.contentType?.sys
-            ?.id,
-        })),
-      }
-    );
-  }
-
   return (
     <motion.div
       initial="hidden"
@@ -188,53 +73,12 @@ const BlurbWrapper = ({ entry }: { entry: IBlurb }) => {
       }}
       transition={{ duration: 0.3 }}
     >
-      {hasImages ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          {/* Content Column */}
-          <motion.div
-            variants={contentVariants}
-            className={`prose prose-lg max-w-none ${getTextClass()} prose-headings:text-current prose-p:text-current prose-strong:text-current prose-em:text-current prose-headings:font-bold prose-p:leading-relaxed`}
-            {...inspectorProps({ fieldId: "body" })}
-          >
-            {body && documentToReactComponents(body, baseRichTextOptions)}
-          </motion.div>
-
-          {/* Images Column */}
-          <motion.div
-            variants={imageVariants}
-            className="space-y-6"
-            {...inspectorProps({ fieldId: "images" })}
-          >
-            {extractedImageUrls.map((imageUrl, index) => (
-              <motion.div
-                key={index}
-                className="relative overflow-hidden rounded-xl"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-              >
-                <div className="aspect-video relative">
-                  <Image
-                    src={imageUrl || ""}
-                    alt={`${internalTitle} image ${index + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      ) : (
-        /* No images - render content with better readability */
-        <motion.div
-          variants={centeredVariants}
-          className={`prose prose-lg max-w-none ${getTextClass()} prose-headings:text-current prose-p:text-current prose-strong:text-current prose-em:text-current prose-headings:font-bold prose-p:leading-relaxed`}
-          {...inspectorProps({ fieldId: "body" })}
-        >
-          {body && documentToReactComponents(body, baseRichTextOptions)}
-        </motion.div>
-      )}
+      <div
+        className={`prose prose-lg max-w-none ${getTextClass()} prose-headings:text-current prose-p:text-current prose-strong:text-current prose-em:text-current prose-headings:font-bold prose-p:leading-relaxed`}
+        {...inspectorProps({ fieldId: "body" })}
+      >
+        {body && documentToReactComponents(body, baseRichTextOptions)}
+      </div>
     </motion.div>
   );
 };

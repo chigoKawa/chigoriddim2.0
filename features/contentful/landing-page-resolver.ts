@@ -26,7 +26,7 @@ export async function resolveLandingPageByPath(params: {
     {
       content_type: "landingPage",
       "fields.fullPath": slugPath,
-      include: 6,
+      include: 10,
       locale,
     },
     isPreviewEnabled,
@@ -41,7 +41,7 @@ export async function resolveLandingPageByPath(params: {
       {
         content_type: "landingPage",
         "fields.slugSegment": lastSegment,
-        include: 6,
+        include: 10,
         locale,
       },
       isPreviewEnabled,
