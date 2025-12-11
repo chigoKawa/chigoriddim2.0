@@ -38,13 +38,12 @@ import { toast } from "sonner";
 const codeString = `NEXT_PUBLIC_CTF_SPACE_ID='your-space-id'
 NEXT_PUBLIC_CTF_DELIVERY_TOKEN='your-delivery-access-token'
 NEXT_PUBLIC_CTF_PREVIEW_TOKEN='your-preview-access-token'
-NEXT_PUBLIC_CTF_PREVIEW_SECRET='a-preview-secret'
 NEXT_PUBLIC_CTF_ENVIRONMENT='your-space-environment'
 CONTENTFUL_PREVIEW_SECRET='a-preview-secret'
 NEXT_PUBLIC_CTF_STUDIO_EXPERIENCE_TYPE_ID="experiencePage"
 NEXT_PUBLIC_CTF_HOMEPAGE_SLUG="home"`;
 
-const VERCE_DEPLOY_LINK = `https://vercel.com/new/clone?repository-url=https://github.com/chigoKawa/Contentful-Developer-Basics-Demo&env=NEXT_PUBLIC_CTF_SPACE_ID,NEXT_PUBLIC_CTF_DELIVERY_TOKEN,NEXT_PUBLIC_CTF_PREVIEW_TOKEN,NEXT_PUBLIC_CTF_PREVIEW_SECRET,NEXT_PUBLIC_CTF_ENVIRONMENT`;
+const VERCE_DEPLOY_LINK = `https://vercel.com/new/clone?repository-url=https://github.com/chigoKawa/Contentful-Developer-Basics-Demo&env=NEXT_PUBLIC_CTF_SPACE_ID,NEXT_PUBLIC_CTF_DELIVERY_TOKEN,NEXT_PUBLIC_CTF_PREVIEW_TOKEN,NEXT_PUBLIC_CTF_ENVIRONMENT,CONTENTFUL_PREVIEW_SECRET`;
 
 // Define the form schema with validation
 const formSchema = z.object({
