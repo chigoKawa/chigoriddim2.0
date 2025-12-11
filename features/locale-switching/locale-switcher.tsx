@@ -16,29 +16,37 @@ import {
 } from "@/components/ui/select";
 
 const LocaleSwitcher = () => {
-  const [locales, setLocales] = useState<string[]>([]);
-  const [defaultLocale, setDefaultLocale] = useState<string>("en-US");
-  const [selectedLocale, setSelectedLocale] = useState<string>("en-US");
+  const [locales, setLocales] = useState<Locale[]>([]);
+  const [defaultLocale, setDefaultLocale] = useState<Locale>("en-US" as Locale);
+  const [selectedLocale, setSelectedLocale] = useState<Locale>(
+    "en-US" as Locale
+  );
+
   const pathname = usePathname();
   const router = useRouter();
+
+  const getFlag = (locale: string) => {
+    const country = locale.split("-")[1] ?? locale;
+    return toFlag(country);
+  };
 
   const redirectedPathname = (nextLocale: Locale) => {
     if (!pathname) return "/";
 
-    const segments = pathname.split("/").filter(Boolean); // e.g., ['blog', 'post'] or ['en-US', 'blog', 'post']
+    const segments = pathname.split("/").filter(Boolean);
+    const isPrefixed =
+      segments.length > 0 && locales.includes(segments[0] as Locale);
 
-    const isPrefixed = segments.length > 0 && locales.includes(segments[0]);
-
-    // Clean URL for default locale: remove locale prefix if present
+    // Default locale → clean URL (no prefix)
     if (nextLocale === defaultLocale) {
       if (isPrefixed) {
         const rest = segments.slice(1);
         return `/${rest.join("/")}` || "/";
       }
-      return pathname; // already clean
+      return pathname;
     }
 
-    // Non-default locale: ensure the locale is the first segment
+    // Non-default locale → add or replace prefix
     if (isPrefixed) {
       segments[0] = nextLocale;
     } else {
@@ -49,34 +57,40 @@ const LocaleSwitcher = () => {
   };
 
   const onSelectionChange = (locale: string) => {
-    router.push(redirectedPathname(locale));
-    setSelectedLocale(locale);
+    const next = locale as Locale;
+    router.push(redirectedPathname(next));
+    setSelectedLocale(next);
   };
-  // Keep the selected option in sync with the current path
-  useEffect(() => {
-    const seg = pathname.split("/").filter(Boolean)[0];
-    const current = locales.includes(seg) ? seg : defaultLocale;
-    setSelectedLocale(current);
-    return () => {};
-  }, [pathname, locales, defaultLocale]);
 
+  // Fetch i18n config once on mount
   useEffect(() => {
-    const fetchLocales = async () => {
-      const ii8nConfig = await getI18nConfig();
-      setLocales(ii8nConfig.locales);
-      setDefaultLocale(ii8nConfig.defaultLocale);
-      // Initialize selection based on current path
-      const seg = pathname.split("/").filter(Boolean)[0];
-      const current = ii8nConfig.locales.includes(seg)
-        ? seg
-        : ii8nConfig.defaultLocale;
+    const init = async () => {
+      const config = await getI18nConfig();
+      setLocales(config.locales);
+      setDefaultLocale(config.defaultLocale);
+
+      if (!pathname) return;
+
+      const seg = pathname.split("/").filter(Boolean)[0] as Locale | undefined;
+      const current =
+        seg && config.locales.includes(seg) ? seg : config.defaultLocale;
+
       setSelectedLocale(current);
     };
 
-    fetchLocales();
-    return () => {};
-  }, [pathname]);
-  console.log(toFlag("en-US"));
+    init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Intentionally run only on mount
+
+  // Sync selected locale with pathname when navigation occurs
+  useEffect(() => {
+    if (!pathname || locales.length === 0) return;
+
+    const seg = pathname.split("/").filter(Boolean)[0] as Locale | undefined;
+    const current = seg && locales.includes(seg) ? seg : defaultLocale;
+    setSelectedLocale(current);
+  }, [pathname, locales, defaultLocale]); // These dependencies are correct
+
   return (
     <div>
       <Select onValueChange={onSelectionChange} value={selectedLocale}>
@@ -86,16 +100,14 @@ const LocaleSwitcher = () => {
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Locale</SelectLabel>
-            {locales?.map((locale: string) => {
-              return (
-                <SelectItem key={locale} value={locale}>
-                  <span className=" uppercase flex gap-2 items-center">
-                    {locale}
-                    <span>{toFlag(locale)}</span>
-                  </span>
-                </SelectItem>
-              );
-            })}
+
+            {locales.map((locale) => (
+              <SelectItem key={locale} value={locale}>
+                <span className="uppercase flex gap-2 items-center">
+                  {locale} <span>{getFlag(locale)}</span>
+                </span>
+              </SelectItem>
+            ))}
           </SelectGroup>
         </SelectContent>
       </Select>

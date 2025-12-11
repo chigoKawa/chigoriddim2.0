@@ -25,6 +25,11 @@ const nextConfig = async (): Promise<NextConfig> => {
       ],
     },
 
+    // Fix Turbopack root directory to avoid caching issues with multiple lockfiles
+    turbopack: {
+      root: process.cwd(),
+    },
+
     async headers() {
       return [
         {
