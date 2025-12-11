@@ -1,7 +1,31 @@
 {
   "version": 1,
-  "generatedAt": "2025-12-11T21:15:57.914Z",
+  "generatedAt": "2025-12-11T22:03:47.590Z",
   "documents": [
+    {
+      "id": "2gwgbN2vNEu52cFXYdqrYS",
+      "type": "page",
+      "title": "Slug Smith | Contentful App ",
+      "path": "/projects/slug-smith-or-contentful-app",
+      "excerpt": "Slug Smith is a Contentful sidebar app that auto‑generates clean, hierarchical URLs, tracks previous paths, and prevents slug conflicts for large content‑driven websites.",
+      "updatedAt": "2025-12-11T21:51:28.170Z"
+    },
+    {
+      "id": "1gcUjwg8plmPFhGBB7XnXK",
+      "type": "page",
+      "title": "Projects",
+      "path": "/projects",
+      "excerpt": "Projects",
+      "updatedAt": "2025-12-11T21:46:47.355Z"
+    },
+    {
+      "id": "faqHome",
+      "type": "page",
+      "title": "Help & FAQs",
+      "path": "/faqs",
+      "excerpt": "All frequently asked questions for the people portal.",
+      "updatedAt": "2025-12-11T21:20:53.026Z"
+    },
     {
       "id": "2HP8lYdUk9zncpfKRWKyf8",
       "type": "page",
@@ -19,29 +43,13 @@
       "updatedAt": "2025-12-11T17:38:12.556Z"
     },
     {
-      "id": "faqHome",
-      "type": "page",
-      "title": "Help & FAQs",
-      "path": "/faqs",
-      "excerpt": "All frequently asked questions for the people portal.",
-      "updatedAt": "2025-12-11T11:59:59.678Z"
-    },
-    {
-      "id": "faqIt",
-      "type": "page",
-      "title": "IT & Access FAQs",
-      "path": "/faqs/it-faqs",
-      "excerpt": "Questions about login, password resets, and tools.",
-      "updatedAt": "2025-12-11T11:59:59.624Z"
-    },
-    {
       "id": "2NIpMxjR70RiceH7PVsn7S",
       "type": "blog",
       "title": "The Machine in the Middle",
       "path": "/blog/the-machine-in-the-middle",
       "excerpt": "The web has a new gatekeeper, and it’s not your search engine. If a machine can’t see you, no one can. Here’s what that means.",
       "publishedDate": null,
-      "updatedAt": "2025-12-11T20:04:36.206Z"
+      "updatedAt": "2025-12-11T21:23:32.669Z"
     }
   ]
 }

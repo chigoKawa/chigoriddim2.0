@@ -40,27 +40,45 @@ const BlurbWrapper = ({ entry }: { entry: IBlurb }) => {
   const images = liveEntry?.fields?.images;
   const backgroundColor = liveEntry?.fields?.backgroundColor || "Default";
 
-  const extractedImageUrls = images?.map((image) => {
-    const imageEntry = image as unknown as IImageWrapper | IPexelsImageWrapper;
-    const fields = imageEntry?.fields as Partial<
-      IImageWrapper["fields"] & IPexelsImageWrapper["fields"]
-    >;
+  const extractedImageUrls = images
+    ?.map((image) => {
+      const imageEntry = image as unknown as
+        | IImageWrapper
+        | IPexelsImageWrapper;
+      const contentTypeId = imageEntry?.sys?.contentType?.sys?.id;
+      const fields = imageEntry?.fields as Partial<
+        IImageWrapper["fields"] & IPexelsImageWrapper["fields"]
+      > &
+        Partial<{ image?: Asset }>;
 
-    // Handle Contentful Asset
-    const asset = (fields?.asset ||
-      (fields as unknown as { image?: Asset })?.image) as Asset | undefined;
+      // Handle imageWrapper content type
+      if (contentTypeId === "imageWrapper") {
+        const asset = (fields?.asset || fields?.image) as Asset | undefined;
+        const url = extractContentfulAssetUrl(asset || null);
+        return url?.replace(/^\/\//, "https://");
+      }
 
-    // Handle Pexels image (both new and legacy formats)
-    const pexelsData = fields?.pexelsImage as
-      | IPexelsPhotoData
-      | IPexelsPhotoDataLegacy
-      | undefined;
-    const pexelsUrl = getPexelsImageUrl(pexelsData);
+      // Handle pexelsImageWrapper content type
+      if (contentTypeId === "pexelsImageWrapper") {
+        const pexelsData = fields?.pexelsImage as
+          | IPexelsPhotoData
+          | IPexelsPhotoDataLegacy
+          | undefined;
+        const pexelsUrl = getPexelsImageUrl(pexelsData);
+        return pexelsUrl?.replace(/^\/\//, "https://");
+      }
 
-    // Use the appropriate URL and convert protocol-relative to absolute
-    const url = extractContentfulAssetUrl(asset || null) || pexelsUrl;
-    return url?.replace(/^\/\//, "https://");
-  });
+      // Fallback: try both approaches
+      const asset = (fields?.asset || fields?.image) as Asset | undefined;
+      const pexelsData = fields?.pexelsImage as
+        | IPexelsPhotoData
+        | IPexelsPhotoDataLegacy
+        | undefined;
+      const pexelsUrl = getPexelsImageUrl(pexelsData);
+      const url = extractContentfulAssetUrl(asset || null) || pexelsUrl;
+      return url?.replace(/^\/\//, "https://");
+    })
+    .filter((url): url is string => !!url);
 
   // Animation variants
   const containerVariants = {
@@ -141,6 +159,21 @@ const BlurbWrapper = ({ entry }: { entry: IBlurb }) => {
   };
 
   const hasImages = extractedImageUrls && extractedImageUrls.length > 0;
+
+  // Debug log for development
+  if (process.env.NODE_ENV === "development" && images?.length && !hasImages) {
+    console.log(
+      "[BlurbWrapper] Images field has entries but no URLs extracted:",
+      {
+        imagesCount: images.length,
+        imageEntries: images.map((img) => ({
+          id: (img as unknown as IImageWrapper)?.sys?.id,
+          contentType: (img as unknown as IImageWrapper)?.sys?.contentType?.sys
+            ?.id,
+        })),
+      }
+    );
+  }
 
   return (
     <motion.div
