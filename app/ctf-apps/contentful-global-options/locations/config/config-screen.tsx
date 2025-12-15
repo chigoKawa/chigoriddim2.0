@@ -286,9 +286,13 @@ const ConfigScreen = () => {
     const parameters: InstallationParameters = { optionSets: sanitized };
     lastParametersRef.current = parameters;
     setSaving(true);
+    const currentState = await sdk.app.getCurrentState();
     setSaving(false);
-    return { parameters };
-  }, [optionSets]);
+    return {
+      parameters,
+      targetState: currentState ?? undefined,
+    };
+  }, [optionSets, sdk.app]);
 
   useEffect(() => {
     sdk.app.onConfigure(onConfigure);
