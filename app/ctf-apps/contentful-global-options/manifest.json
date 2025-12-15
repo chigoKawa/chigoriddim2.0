@@ -1,0 +1,18 @@
+{
+  "name": "Contentful Global Options",
+  "src": "app/ctf-apps/contentful-global-options/page.tsx",
+  "locations": [
+    {
+      "location": "page",
+      "src": "app/ctf-apps/contentful-global-options/locations/app-page/app-page.tsx"
+    },
+    {
+      "location": "field",
+      "src": "app/ctf-apps/contentful-global-options/locations/field/global-options-field.tsx"
+    },
+    {
+      "location": "app-config",
+      "src": "app/ctf-apps/contentful-global-options/locations/config/config-screen.tsx"
+    }
+  ]
+}

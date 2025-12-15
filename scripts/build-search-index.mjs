@@ -7,7 +7,7 @@
  */
 
 import { createClient } from "contentful";
-import { writeFileSync, mkdirSync } from "fs";
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
@@ -119,10 +119,49 @@ function processBlogPosts(entries) {
     });
 }
 
+/**
+ * Load existing search index to compare for removed pages
+ */
+function loadExistingIndex() {
+  if (!existsSync(OUTPUT_PATH)) {
+    return null;
+  }
+  try {
+    const content = readFileSync(OUTPUT_PATH, "utf-8");
+    return JSON.parse(content);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Compare old and new documents to find removed pages
+ */
+function findRemovedPages(oldDocs, newDocs) {
+  if (!oldDocs || !Array.isArray(oldDocs)) return [];
+
+  const newIds = new Set(newDocs.map((doc) => doc.id));
+  return oldDocs.filter((doc) => !newIds.has(doc.id));
+}
+
+/**
+ * Compare old and new documents to find added pages
+ */
+function findAddedPages(oldDocs, newDocs) {
+  if (!oldDocs || !Array.isArray(oldDocs)) return newDocs;
+
+  const oldIds = new Set(oldDocs.map((doc) => doc.id));
+  return newDocs.filter((doc) => !oldIds.has(doc.id));
+}
+
 async function buildSearchIndex() {
   console.log("🔍 Building search index...");
 
   try {
+    // Load existing index for comparison
+    const existingIndex = loadExistingIndex();
+    const existingDocs = existingIndex?.documents || [];
+
     // Fetch all content types
     console.log("  Fetching landing pages...");
     const landingPages = await fetchAllEntries("landingPage");
@@ -137,6 +176,33 @@ async function buildSearchIndex() {
       ...processLandingPages(landingPages),
       ...processBlogPosts(blogPosts),
     ];
+
+    // Find removed and added pages
+    const removedPages = findRemovedPages(existingDocs, documents);
+    const addedPages = findAddedPages(existingDocs, documents);
+
+    // Log changes
+    if (removedPages.length > 0) {
+      console.log(`  🗑️  Removed ${removedPages.length} page(s):`);
+      removedPages.forEach((page) => {
+        console.log(`      - ${page.title} (${page.path})`);
+      });
+    }
+
+    if (addedPages.length > 0) {
+      console.log(`  ➕ Added ${addedPages.length} page(s):`);
+      addedPages.forEach((page) => {
+        console.log(`      + ${page.title} (${page.path})`);
+      });
+    }
+
+    if (
+      removedPages.length === 0 &&
+      addedPages.length === 0 &&
+      existingDocs.length > 0
+    ) {
+      console.log("  ℹ️  No pages added or removed");
+    }
 
     // Create the index data structure
     const searchIndex = {
