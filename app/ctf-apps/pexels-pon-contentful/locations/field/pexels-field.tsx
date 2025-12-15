@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useCallback, useState } from "react";
@@ -5,6 +6,7 @@ import { Box, Button, Note, Paragraph, Text } from "@contentful/f36-components";
 import type { FieldAppSDK } from "@contentful/app-sdk";
 import { useSDK, useAutoResizer } from "@contentful/react-apps-toolkit";
 import type { PexelsImage } from "../../types";
+import { createPexelsAsset } from "../../utils/createPexelsAsset";
 
 export default function PexelsField() {
   const sdk = useSDK<FieldAppSDK>();
@@ -31,6 +33,11 @@ export default function PexelsField() {
   const [lastOrientation, setLastOrientation] = useState<
     "any" | "landscape" | "portrait" | "square"
   >("any");
+  const [savingAsset, setSavingAsset] = useState(false);
+  const [assetError, setAssetError] = useState<string | null>(null);
+  const [assetSuccess, setAssetSuccess] = useState<{ assetId: string } | null>(
+    null
+  );
 
   const handleOpenDialog = useCallback(async () => {
     // Allow opening if proxy handles API key OR if we have an API key
@@ -77,6 +84,30 @@ export default function PexelsField() {
     sdk.field.removeValue();
     setCurrent(null);
   }, [sdk.field]);
+
+  const handleSaveAsAsset = useCallback(async () => {
+    if (!current) return;
+
+    setSavingAsset(true);
+    setAssetError(null);
+    setAssetSuccess(null);
+
+    const result = await createPexelsAsset(sdk, current);
+
+    if (result.success) {
+      setAssetSuccess(
+        result.assetId
+          ? { assetId: result.assetId }
+          : (null as typeof assetSuccess)
+      );
+      sdk.notifier.success("Image saved to Contentful assets");
+    } else {
+      setAssetError(result.error || "Failed to create asset");
+      sdk.notifier.error(`Failed to save asset: ${result.error}`);
+    }
+
+    setSavingAsset(false);
+  }, [current, sdk]);
 
   if (!proxyHandlesApiKey && !apiKey) {
     return (
@@ -166,10 +197,42 @@ export default function PexelsField() {
                   marginTop: 8,
                 }}
               >
+                <Button
+                  size="small"
+                  onClick={handleSaveAsAsset}
+                  variant="positive"
+                  isDisabled={savingAsset}
+                >
+                  {savingAsset ? "Saving..." : "Save as Contentful Asset"}
+                </Button>
                 <Button size="small" onClick={handleClear} variant="secondary">
                   Clear
                 </Button>
               </Box>
+              {assetSuccess && (
+                <Note variant="positive" style={{ marginTop: 8 }}>
+                  <Text>
+                    Asset created successfully!{" "}
+                    <a
+                      href={`https://app.contentful.com/spaces/${
+                        sdk.ids.space
+                      }/environments/${
+                        sdk.ids.environment ?? "master"
+                      }/assets/${assetSuccess.assetId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#0b63ce", textDecoration: "underline" }}
+                    >
+                      View asset
+                    </a>
+                  </Text>
+                </Note>
+              )}
+              {assetError && (
+                <Note variant="negative" style={{ marginTop: 8 }}>
+                  <Text>{assetError}</Text>
+                </Note>
+              )}
             </Box>
           </Box>
         </Box>
