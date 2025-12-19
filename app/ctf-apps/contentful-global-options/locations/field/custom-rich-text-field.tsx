@@ -36,7 +36,7 @@ export default function CustomRichTextField({ sdk }: CustomRichTextFieldProps) {
         const currentValue = sdk.field.getValue() || {
           nodeType: "document",
           data: {},
-          content: []
+          content: [],
         };
 
         // Create the embedded entry node
@@ -70,7 +70,9 @@ export default function CustomRichTextField({ sdk }: CustomRichTextFieldProps) {
 
   return (
     <Stack spacing="spacingM">
-      <Stack spacing="spacingS" flexDirection="row">
+      <Stack spacing="spacingS" flexDirection="row"></Stack>
+
+      <div className="flex flex-col gap-4">
         <Button
           variant="secondary"
           size="small"
@@ -79,12 +81,8 @@ export default function CustomRichTextField({ sdk }: CustomRichTextFieldProps) {
         >
           Add Pexels Image Wrapper
         </Button>
-      </Stack>
-
-      <RichTextEditor
-        sdk={sdk}
-        isInitiallyDisabled={false}
-      />
+        <RichTextEditor sdk={sdk} isInitiallyDisabled={false} />
+      </div>
     </Stack>
   );
 }
