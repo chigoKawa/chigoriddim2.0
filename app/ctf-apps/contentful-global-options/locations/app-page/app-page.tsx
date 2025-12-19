@@ -11,6 +11,9 @@ import {
   Text,
 } from "@contentful/f36-components";
 
+
+
+
 export default function AppPage() {
   return (
     <Flex justifyContent="center" padding="spacingXl">

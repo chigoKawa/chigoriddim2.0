@@ -21,6 +21,16 @@ import type {
   OptionSet,
   StringOptionSet,
 } from "../../types";
+// import dynamic from 'next/dynamic';
+// import CustomRichTextField from "./custom-rich-text-field";
+import { lazy } from 'react';
+
+const CustomRichTextField = lazy(() => import('./custom-rich-text-field'));
+
+// const CustomRichTextField = dynamic(
+//   () => import('./custom-rich-text-field'),
+//   { ssr: false }
+// );
 
 const isArrayField = (sdk: FieldAppSDK) => sdk.field.type === "Array";
 
@@ -124,6 +134,12 @@ export default function GlobalOptionsField() {
   const instanceParams = useMemo(() => getInstanceParams(sdk), [sdk]);
   const isJsonField = sdk.field.type === "Object";
   useAutoResizer();
+
+  if (sdk.field.type === "RichText") {
+    return <CustomRichTextField sdk={sdk} />;
+  }
+
+ 
 
   const multiSelect =
     instanceParams.multiSelect !== undefined
